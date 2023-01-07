@@ -1,17 +1,17 @@
 const express = require('express');
 const { Sequelize } = require('sequelize');
 
-const { User } = require('../models/index');
+const { User, Article } = require('../models/index');
 
-const userRoutes = express();
+const userRoute = express();
 
 //REST declarations
 
-userRoutes.get('/user', getUsers);
-userRoutes.get('/user/:id', getUser);
-userRoutes.post('/user', createUser);
-userRoutes.put('/user/:id', updateUser);
-userRoutes.delete('/user/:id', deleteUser);
+userRoute.get('/user', getUsers);
+userRoute.get('/user/:id', getUser);
+userRoute.post('/user', createUser);
+userRoute.put('/user/:id', updateUser);
+userRoute.delete('/user/:id', deleteUser);
 
 //REST functions
 
@@ -22,12 +22,22 @@ async function getUsers(req, res) {
 
 async function getUser(req, res, next) {
   const id = req.params.id;
-  const user = await User.findOne( { where: { id : id }});
+  const user = await User.findOne({ 
+  where: { id : id || null },
+  include: Article,
+});
   if (user == null) {
     next();
-  }
-  res.json(user);
-}
+  } else {
+  const rawUser = {
+    id: user.id,
+    username: user.username,
+    password: user.password,
+    role: user.role,
+    article: user.Article.map((article) => article.title),
+  };
+  res.json(rawUser);
+  }}
 
 async function createUser(req, res) {
   const username = req.body.username;
@@ -38,6 +48,10 @@ async function createUser(req, res) {
     password,
     role,
   });
+  const article = req.body.article ?? [];
+  for (const title of article) {
+    await user.createArticle({ title });
+  }
   res.json(user);
 }
 
@@ -72,4 +86,4 @@ async function updateUser (req, res) {
   }
 }
 
-module.exports = { userRoutes}
+module.exports = { userRoute }
