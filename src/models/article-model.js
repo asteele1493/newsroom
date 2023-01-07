@@ -5,7 +5,7 @@ function makeArticle(sequelize) {
     title: DataTypes.STRING,
     author: DataTypes.STRING,
     //Format: YYYY-MM-DD
-    pubDate: DataTypes.DATE,
+    pubDate: DataTypes.DATEONLY,
   })
 }
 
