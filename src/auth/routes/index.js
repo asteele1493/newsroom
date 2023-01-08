@@ -43,7 +43,7 @@ async function signin(req, res, next) {
   let user = await User.findLoggedIn(username, password);
   if (user) {
     // res.status(200).send({ username: user.username });
-    const data = ({ username: user.username, role: user.role });
+    const data = ({ username: user.username });
     const token = jwt.sign(data, TOKEN_SECRET);
     //Instead of sending back the username, send back the JWT.
     res.send(token);

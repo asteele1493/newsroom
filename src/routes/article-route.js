@@ -43,6 +43,7 @@ async function createArticle(req, res) {
   const title = req.body.title;
   const author = req.body.author;
   const pubDate = Date.parse(req.body.pubDate);
+  const read = req.body.read;
   const article = await Article.create({
     title,
     author,
