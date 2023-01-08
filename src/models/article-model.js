@@ -6,6 +6,7 @@ function makeArticle(sequelize) {
     author: DataTypes.STRING,
     //Format: YYYY-MM-DD
     pubDate: DataTypes.DATEONLY,
+    read: DataTypes.BOOLEAN
   })
 }
 

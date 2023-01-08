@@ -25,6 +25,5 @@ const User = makeUser(sequelize);
 const Article = makeArticle(sequelize);
 
 User.hasMany(Article);
-// Article.belongsTo(User);
 
 module.exports = { User, sequelize, Article }
