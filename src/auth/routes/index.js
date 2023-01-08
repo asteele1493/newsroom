@@ -17,11 +17,11 @@ authRoutes.post('/signup', signup);
 authRoutes.post('/signin', signin);
 
 async function signup(req, res, next) {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
   let auth = `${username}:${password}`;
   let encoded_auth = 'Basic ' + base64.encode(auth);
   console.log('Encoded auth', encoded_auth);
-  const user = await User.createWithHashed(username, password, 'reader');
+  const user = await User.createWithHashed(username, password);
   // On a successful account creation, return a 201 status with the user object in the body.
   res.status(201).json(user);
 }
@@ -71,5 +71,16 @@ async function checkToken(request, _, next) {
    }
 }
 
+function ensureRole(roles) {
+  return function checkRole(req, _, next) {
+    if (roles.includes(req.role)) {
+      next();
+    } else {
+      next(new Error('Insufficient permissions'));
+    }
+  };
+}
 
-module.exports = { authRoutes, signin, signup, checkToken };
+
+
+module.exports = { authRoutes, signin, signup, checkToken, ensureRole };

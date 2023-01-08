@@ -3,19 +3,29 @@ const { Sequelize } = require('sequelize');
 
 const { Article } = require('../models/index');
 
+const {ensureRole, checkToken } = require('../auth/routes');
+
 const articleRoute = express();
+
+articleRoute.use(checkToken);
 
 //REST declarations
 
-articleRoute.get('/article', getArticle);
-articleRoute.get('/article/:id', getArticle);
-articleRoute.post('/article', createArticle);
-articleRoute.put('/article/:id', updateArticle);
-articleRoute.delete('/article/:id', deleteArticle);
+articleRoute.get('/article', ensureRole(['user', 'author', 'editor', 'manager']),
+getArticles
+);
+articleRoute.get('/article/:id', ensureRole(['user', 'author', 'editor', 'manager']),
+ getArticle);
+articleRoute.post('/article', ensureRole(['author', 'editor']),
+createArticle);
+articleRoute.put('/article/:id', ensureRole(['author', 'editor']),
+updateArticle);
+articleRoute.delete('/article/:id', ensureRole(['manager', 'editor']),
+deleteArticle);
 
 //REST functions
 
-async function getArticle(req, res) {
+async function getArticles(req, res) {
   const allArticles = await Article.findAll();
   res.json(allArticles);
 }
@@ -37,6 +47,7 @@ async function createArticle(req, res) {
     title,
     author,
     pubDate,
+    read,
   });
   res.json(article);
 }
@@ -61,11 +72,13 @@ async function updateArticle (req, res) {
     const title = req.body.title ?? article.title;
     const author = req.body.author ?? article.author;
     const pubDate = req.body.pubDate ?? article.pubDate;
+    const read = req.body.read ?? article.read;
 
     let updatedArticle = {
       title,
       author,
       pubDate,
+      read,
     }
     article = await article.update(updatedArticle);
     res.status(200).json(article);

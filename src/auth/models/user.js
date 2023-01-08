@@ -7,7 +7,7 @@ function makeUser(sequelize) {
   const User = sequelize.define("User", {
     username: DataTypes.STRING,
     password: DataTypes.STRING,
-    role: DataTypes.STRING, //'reader', 'writer', 'editor', 'admin'
+    role: DataTypes.STRING, 
   });
 
   console.log(User);
