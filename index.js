@@ -8,7 +8,7 @@ const { server } = require('./src/server');
 const port = process.env.PORT || 3000;
 
 server.listen(port, async () => {
-  // await sequelize.drop();
+  await sequelize.drop();
   await sequelize.sync({
     alter:true
   });

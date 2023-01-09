@@ -15,7 +15,7 @@ function makeUser(sequelize) {
   User.createWithHashed = async (username, password, role) => {
     try {
       password = await bcrypt.hash(password, COMPLEXITY);
-      console.log("Creating new user", username, password);
+      console.log("Creating new user", username);
       return await User.create({ username, password, role });
     } catch (e) {
       console.error(e);

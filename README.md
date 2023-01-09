@@ -22,8 +22,8 @@ This application employs the following programming concepts:
 
 .env requirements
   - PORT=3000
-  - DATABASE_URL=
-  - TOKEN_SECRET=
+  - DATABASE_URL=postgres://localhost:5432/postgres
+  - TOKEN_SECRET=66606660666
 
 to start
 
@@ -35,6 +35,5 @@ to run tests
 ```javascript
 npm test
 ```
-
 
 ![UML diagram](./uml_lab9.png)

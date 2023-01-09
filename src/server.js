@@ -21,7 +21,7 @@ server.get('/loggedin', checkToken, (req, res) => {
 server.use(express.json());
 server.use(authRoutes);
 server.use(userRoute);
-server.use(articleRoute);
+server.use(checkToken, articleRoute);
 server.use(logger);
 server.use('*', notFound);
 server.use(serverError);

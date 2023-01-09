@@ -17,11 +17,11 @@ authRoutes.post('/signup', signup);
 authRoutes.post('/signin', signin);
 
 async function signup(req, res, next) {
-  const { username, password, role } = req.body;
+  const { username, password } = req.body;
   let auth = `${username}:${password}`;
   let encoded_auth = 'Basic ' + base64.encode(auth);
   console.log('Encoded auth', encoded_auth);
-  const user = await User.createWithHashed(username, password);
+  const user = await User.createWithHashed(username, password, 'author');
   // On a successful account creation, return a 201 status with the user object in the body.
   res.status(201).json(user);
 }
@@ -31,7 +31,6 @@ async function signup(req, res, next) {
 async function signin(req, res, next) {
   let authorization = req.header('Authorization');
   if (!authorization.startsWith('Basic ')) {
-    // On any error, trigger your error handler with an appropriate error.
     next(new Error('Invalid authorization scheme'));
     return;
   }
@@ -43,7 +42,7 @@ async function signin(req, res, next) {
   let user = await User.findLoggedIn(username, password);
   if (user) {
     // res.status(200).send({ username: user.username });
-    const data = ({ username: user.username });
+    const data = ({ username: user.username, role: user.role });
     const token = jwt.sign(data, TOKEN_SECRET);
     //Instead of sending back the username, send back the JWT.
     res.send(token);
@@ -52,10 +51,10 @@ async function signin(req, res, next) {
   }
 }
 
-//handler function
-async function checkToken(request, _, next) {
+
+async function checkToken(req, _, next) {
   //look up the token
-  const authorization = request.header('Authorization') ?? '';
+  const authorization = req.header('Authorization') ?? '';
    if (!authorization.startsWith('Bearer ')){
     next(new Error('Missing required bearer header'));
     return;
@@ -64,16 +63,17 @@ async function checkToken(request, _, next) {
    try{
    const token = authorization.replace('Bearer ', '');
    const decoded = jwt.verify(token, TOKEN_SECRET);
-   request.username = decoded.username;
+   req.username = decoded.username;
+   req.role = decoded.role;
    next();
    } catch (e){
     next(new Error('Failed to decode', {cause: e}))
    }
 }
 
-function ensureRole(roles) {
+function ensureRole(role) {
   return function checkRole(req, _, next) {
-    if (roles.includes(req.role)) {
+    if (role.includes(req.role)) {
       next();
     } else {
       next(new Error('Insufficient permissions'));
