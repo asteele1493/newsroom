@@ -26,10 +26,7 @@ deleteArticle);
 //REST functions
 
 async function getArticles(req, res) {
-  const article = await Article.findAll();
-  if(article == null){
-    next();
-  }
+  const allArticles = await Article.findAll();
   res.json(allArticles);
 } 
 
